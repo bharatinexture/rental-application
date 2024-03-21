@@ -1,0 +1,53 @@
+package com.example.rentalapplication.exception;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+@RestControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final static String MESSAGES = "messages";
+
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        List<String> details = new ArrayList<String>();
+        details = ex.getBindingResult().getFieldErrors().stream().map(error -> error.getField() + " : " + error.getDefaultMessage()).collect(Collectors.toList());
+
+        logger.error("Validation error occurred:", ex);
+        Map<String, List<String>> errorMap = details.stream()
+                .map(error -> error.split(" : ", 2))
+                .filter(parts -> parts.length == 2)
+                .collect(Collectors.groupingBy(
+                        parts -> parts[0].trim(),
+                        Collectors.mapping(parts -> parts[1].trim(), Collectors.toList())
+                ));
+
+        Map<String,Object>  errorMessages = new HashMap<>();
+        errorMessages.put(MESSAGES,errorMap);
+        return ResponseEntity.badRequest().body(new Error(HttpStatus.BAD_REQUEST, errorMap));
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleCampaignBadRequestException(Exception ex, WebRequest request) {
+        logger.error("Exception: " + ex.getMessage(), ex);
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+}
