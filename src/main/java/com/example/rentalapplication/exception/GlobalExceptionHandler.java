@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -31,7 +29,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> details = new ArrayList<String>();
         details = ex.getBindingResult().getFieldErrors().stream().map(error -> error.getField() + " : " + error.getDefaultMessage()).collect(Collectors.toList());
 
-        logger.error("Validation error occurred:", ex);
+        logger.error("Validation error occurred: ", ex);
         Map<String, List<String>> errorMap = details.stream()
                 .map(error -> error.split(" : ", 2))
                 .filter(parts -> parts.length == 2)
@@ -44,6 +42,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         errorMessages.put(MESSAGES,errorMap);
         return ResponseEntity.badRequest().body(new Error(HttpStatus.BAD_REQUEST, errorMap));
     }
+
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<Object> handleResourceConflictException(ResourceConflictException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+        logger.error("Database Resource Conflict error occurred: ", ex);
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleCampaignBadRequestException(Exception ex, WebRequest request) {
         logger.error("Exception: " + ex.getMessage(), ex);

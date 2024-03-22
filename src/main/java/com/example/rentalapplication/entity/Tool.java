@@ -12,6 +12,7 @@ public class Tool {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, name = "id")
     private Long id;
 
     @Column(unique = true, nullable = false, name = "tool_code")

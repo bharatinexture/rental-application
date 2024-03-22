@@ -1,58 +1,64 @@
 package com.example.rentalapplication.service;
 
 import com.example.rentalapplication.DTO.CheckoutRequest;
-import com.example.rentalapplication.DTO.RentalAgreement;
-import com.example.rentalapplication.entity.Checkout;
+import com.example.rentalapplication.entity.RentalAgreement;
 import com.example.rentalapplication.entity.Tool;
 import com.example.rentalapplication.entity.ToolTypes;
-import com.example.rentalapplication.repository.CheckoutRepository;
+import com.example.rentalapplication.exception.ToolNotFoundException;
+import com.example.rentalapplication.repository.RentalAgreementRepository;
 import com.example.rentalapplication.repository.ToolRepository;
 import com.example.rentalapplication.repository.ToolTypesRepository;
 import jakarta.validation.ValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class CheckoutService {
 
-    @Autowired
-    private ToolRepository toolRepository;
+    private final ToolRepository toolRepository;
 
-    @Autowired
-    private ToolTypesRepository toolTypesRepository;
+    private final ToolTypesRepository toolTypesRepository;
 
-    @Autowired
-    private CheckoutRepository checkoutRepository;
+    private final RentalAgreementRepository rentalAgreementRepository;
+
 
     public RentalAgreement processCheckOut(CheckoutRequest checkoutRequest)  {
+        log.info("Processing checkout request: {}", checkoutRequest);
+
         if (checkoutRequest.getRentalDayCount() < 1) {
+            log.error("Validation failed: Rental day count must be 1 or greater.");
             throw new ValidationException("Rental day count must be 1 or greater.");
         }
         if (checkoutRequest.getDiscountPercent() < 0 || checkoutRequest.getDiscountPercent() > 100) {
+            log.error("Validation failed: Discount percent must be between 0 and 100.");
             throw new ValidationException("Discount percent must be between 0 and 100.");
         }
 
         Tool tool = Optional.ofNullable(toolRepository.findToolByToolCode(checkoutRequest.getToolCode()))
-                .orElseThrow(() -> new IllegalArgumentException("Tool code not found."));
+                .orElseThrow(() -> {
+                    log.error("Tool code not found: {}", checkoutRequest.getToolCode());
+                    return new ToolNotFoundException("Tool code not found.");
+                });
+        log.info("Tool was found: " + tool);
 
         ToolTypes toolType = Optional.ofNullable(toolTypesRepository.findByType(tool.getToolType()))
-                .orElseThrow(() -> new IllegalArgumentException("Tool type not found."));
+                .orElseThrow(() -> new ToolNotFoundException("Tool type not found."));
+        log.info("ToolType was found: " + toolType);
 
+        // all the calculations regarding the charged days, discount, and holidays happen at the very moment an instance of RentalAgreement is created
         RentalAgreement rentalAgreement = new RentalAgreement(checkoutRequest, tool, toolType);
         rentalAgreement.displayRentalAgreement();
+
+        rentalAgreementRepository.save(rentalAgreement);
+        log.info("RentalAgreement was saved into the db successfully.");
 
         return rentalAgreement;
 
     }
 
-
-
 }
-
-

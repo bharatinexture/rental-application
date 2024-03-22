@@ -1,14 +1,13 @@
 package com.example.rentalapplication;
 
 import com.example.rentalapplication.DTO.CheckoutRequest;
-import com.example.rentalapplication.DTO.RentalAgreement;
+import com.example.rentalapplication.entity.RentalAgreement;
 import com.example.rentalapplication.entity.Tool;
 import com.example.rentalapplication.entity.ToolTypes;
 import com.example.rentalapplication.repository.ToolRepository;
 import com.example.rentalapplication.repository.ToolTypesRepository;
 import com.example.rentalapplication.service.CheckoutService;
 import jakarta.validation.ValidationException;
-import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -26,10 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 public class CheckoutServiceTest {
 
-    @Test
-	void contextLoads() {
-	}
-
     @Mock
     private ToolRepository toolRepository;
 
@@ -39,6 +34,7 @@ public class CheckoutServiceTest {
     @Autowired
     private CheckoutService checkoutService;
 
+    // Test 1
     @Test
     void invalidDiscountTest(){
         CheckoutRequest request = new CheckoutRequest("JAKR",101, LocalDate.of(2015,9,3),5);
@@ -51,6 +47,7 @@ public class CheckoutServiceTest {
         assertThrows(ValidationException.class, () -> checkoutService.processCheckOut(request));
     }
 
+    // Test 2
     @Test
     void rentAgreementTest2(){
         CheckoutRequest request = new CheckoutRequest("LADW",10, LocalDate.of(2020,7,2),3);
@@ -72,6 +69,7 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("3.58"));
     }
 
+    // Test 3
     @Test
     void rentAgreementTest3(){
         CheckoutRequest request =new CheckoutRequest("CHNS",25, LocalDate.of(2015,7,2),5);
@@ -93,6 +91,7 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("3.35"));
     }
 
+    // Test 4
     @Test
     void rentAgreementTest4(){
         CheckoutRequest request = new CheckoutRequest("JAKD",0, LocalDate.of(2015,9,3),6);
@@ -114,6 +113,7 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("8.97"));
     }
 
+    // Test 5
     @Test
     void rentAgreementTest5(){
         CheckoutRequest request = new CheckoutRequest("JAKR",0, LocalDate.of(2015,7,2),9);
@@ -135,6 +135,7 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("14.95"));
     }
 
+    // Test 6
     @Test
     void rentAgreementTest6(){
         CheckoutRequest request = new CheckoutRequest("JAKR",50, LocalDate.of(2020,7,2),4);
@@ -156,7 +157,8 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("1.49"));
     }
 
-    public Map<String, Tool> getTools(){
+    // utility Map to get Tools without interacting with the database
+    public Map<String, Tool>  getTools(){
         Map<String,Tool> tools = new HashMap<>();
         tools.put("CHNS", new Tool("CHNS", "Chainsaw", "Stihl"));
         tools.put("LADW", new Tool("LADW", "Ladder", "Werner"));
@@ -165,6 +167,7 @@ public class CheckoutServiceTest {
         return tools;
     }
 
+    // utility Map to get the ToolTypes without interacting with the database
     public Map<String, ToolTypes> getToolTypes(){
         Map<String,ToolTypes> toolTypes = new HashMap<>();
         toolTypes.put("Ladder", new ToolTypes("Ladder", new BigDecimal("1.99") , true, true, false));

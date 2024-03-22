@@ -1,33 +1,53 @@
-package com.example.rentalapplication.DTO;
+package com.example.rentalapplication.entity;
 
-import com.example.rentalapplication.entity.Tool;
-import com.example.rentalapplication.entity.ToolTypes;
+import com.example.rentalapplication.DTO.CheckoutRequest;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Locale;
 
 @Data
+@Entity
+@Table(name = "rental_agreement")
 @AllArgsConstructor
 @NoArgsConstructor
 public class RentalAgreement {
 
-    private String toolCode;;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, name = "rental_agreement_number")
+    private Long rentalAgreementNumber;
+    @Column(nullable = false, name = "tool_code")
+    private String toolCode;
+    @Column(nullable = false, name = "tool_type")
     private String toolType;
+    @Column(nullable = false, name = "brand")
     private String brand;
+    @Column(nullable = false, name = "rental_days")
     private int rentalDays;
+    @Column(nullable = false, name = "checkout_date")
     private LocalDate checkOutDate;
+    @Column(nullable = false, name = "due_date")
     private LocalDate dueDate;
+    @Column(nullable = false, name = "daily_rental_charge")
     private BigDecimal dailyRentalCharge;
+    @Column(nullable = false, name = "charge_days")
     private int chargedDays;
+    @Column(nullable = false, name = "pre_discount_charge")
     private BigDecimal preDiscountCharge;
+    @Column(nullable = false, name = "discount_percent")
     private int discountPercent;
+    @Column(nullable = false, name = "discount_amount")
     private BigDecimal discountAmount;
+    @Column(nullable = false, name = "final_charge")
     private BigDecimal finalCharge;
 
     public RentalAgreement(CheckoutRequest checkout, Tool tool, ToolTypes toolType) {
@@ -89,6 +109,8 @@ public class RentalAgreement {
     }
 
     public void displayRentalAgreement() {
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.US);
+
         System.out.println("----------------------------------------------------------------------------");
         System.out.println("Tool code: " + toolCode);
         System.out.println("Tool type: " + toolType);
@@ -96,14 +118,13 @@ public class RentalAgreement {
         System.out.println("Rental days: " + rentalDays);
         System.out.printf("Checkout date: %tm/%td/%ty%n", checkOutDate, checkOutDate, checkOutDate);
         System.out.printf("Due date: %tm/%td/%ty%n", dueDate, dueDate, dueDate);
-        System.out.printf("Daily rental charge: $%.2f%n", dailyRentalCharge);
+        System.out.printf("Daily rental charge: %s%n", currencyFormatter.format(dailyRentalCharge));
         System.out.println("Charge days: " + chargedDays);
-        System.out.printf("Pre-discount charge: $%.2f%n", preDiscountCharge);
+        System.out.println("Pre-discount charge: " + currencyFormatter.format(preDiscountCharge));
         System.out.println("Discount percent: " + discountPercent + "%");
-        System.out.printf("Discount amount: $%.2f%n", discountAmount);
-        System.out.printf("Final charge: $%.2f%n", finalCharge);
+        System.out.println("Discount amount: " + currencyFormatter.format(discountAmount));
+        System.out.println("Final charge: " + currencyFormatter.format(finalCharge));
         System.out.println("----------------------------------------------------------------------------");
     }
+
 }
-
-

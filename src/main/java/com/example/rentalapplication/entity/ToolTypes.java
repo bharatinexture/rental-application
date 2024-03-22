@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 public class ToolTypes {
 
     @Id
+    @Column(nullable = false, name = "type")
     private String type;
 
     @Column(nullable = false, name = "daily_rental_charge")
