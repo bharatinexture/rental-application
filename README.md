@@ -48,19 +48,19 @@ You could alternatively also use Postman to test the application.
   - Response Body:
     ```json
     {
-        "id": 6,
-        "toolCode": "CHNS",
-        "toolType": "Chainsaw",
-        "brand": "Stihl",
-        "rentalDays": 10,
-        "checkOutDate": "2022-02-02",
-        "dueDate": "2024-02-12",
-        "dailyRentalCharge": 1.49,
-        "chargedDays": 7,
-        "preDiscountCharge": 10.43,
-        "discountPercent": 22,
-        "discountAmount": 2.29,
-        "finalCharge": 8.14
+    "rentalAgreementNumber": "5",
+    "toolCode": "CHNS",
+    "toolType": "Chainsaw",
+    "brand": "Stihl",
+    "rentalDays": "10",
+    "checkOutDate": "02/02/22",
+    "dueDate": "02/12/22",
+    "dailyRentalCharge": "$1.49",
+    "chargedDays": "7",
+    "preDiscountCharge": "$10.43",
+    "discountPercent": "22%",
+    "discountAmount": "$2.29",
+    "finalCharge": "$8.14"
     }
     ```
 
