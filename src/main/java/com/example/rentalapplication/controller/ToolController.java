@@ -1,5 +1,6 @@
 package com.example.rentalapplication.controller;
 
+import com.example.rentalapplication.DTO.ToolDTO;
 import com.example.rentalapplication.entity.Tool;
 import com.example.rentalapplication.exception.ResourceNotFoundException;
 import com.example.rentalapplication.service.ToolService;
@@ -63,7 +64,7 @@ public class ToolController {
      * @throws BadRequestException if the creation fails due to validation errors or other issues
      */
     @PostMapping
-    public ResponseEntity<Tool> createTool(@RequestBody Tool tool) throws BadRequestException {
+    public ResponseEntity<Tool> createTool(@RequestBody ToolDTO tool) throws BadRequestException {
         log.info("Creating new tool with code: {}", tool.getToolCode());
         try {
             Tool createdTool = toolService.createTool(tool);
@@ -83,7 +84,7 @@ public class ToolController {
      * @return a {@link ResponseEntity} containing the updated {@link Tool} or the HTTP status NOT FOUND
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Tool> updateTool(@PathVariable("id") Long toolId, @RequestBody Tool toolDetails) {
+    public ResponseEntity<Tool> updateTool(@PathVariable("id") Long toolId, @RequestBody ToolDTO toolDetails) {
         log.info("Updating tool with ID {}", toolId);
         try {
             Tool updatedTool = toolService.updateTool(toolId, toolDetails);

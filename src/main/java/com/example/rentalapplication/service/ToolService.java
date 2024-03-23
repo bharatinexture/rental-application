@@ -1,8 +1,10 @@
 package com.example.rentalapplication.service;
 
+import com.example.rentalapplication.DTO.ToolDTO;
 import com.example.rentalapplication.entity.Tool;
 import com.example.rentalapplication.exception.ResourceConflictException;
 import com.example.rentalapplication.exception.ResourceNotFoundException;
+import com.example.rentalapplication.mapper.ToolMapper;
 import com.example.rentalapplication.repository.ToolRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -27,15 +29,15 @@ public class ToolService {
                 .orElseThrow(() -> new ResourceNotFoundException("Tool not found with id: " + toolId));
     }
 
-    public Tool createTool(Tool tool) throws BadRequestException {
+    public Tool createTool(ToolDTO tool) throws BadRequestException {
         if (toolRepository.existsByToolCode(tool.getToolCode())) {
             throw new BadRequestException("Tool with code '" + tool.getToolCode() + "' already exists.");
         }
         log.info("New Tool saved successfully.");
-        return toolRepository.save(tool);
+        return toolRepository.save(ToolMapper.dtoToEntity(tool));
     }
 
-    public Tool updateTool(Long toolId, Tool toolDetails) throws ResourceNotFoundException {
+    public Tool updateTool(Long toolId, ToolDTO toolDetails) throws ResourceNotFoundException {
         Tool tool = toolRepository.findById(toolId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tool not found with id: " + toolId));
 
