@@ -92,9 +92,6 @@ public class ToolController {
         } catch (ResourceNotFoundException ex) {
             log.error("Tool with ID {} not found for update", toolId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (BadRequestException e) {
-            log.error("Error updating tool with ID {}: {}", toolId, e.getMessage());
-            throw new RuntimeException(e);
         }
     }
 
