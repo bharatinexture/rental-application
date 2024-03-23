@@ -63,6 +63,20 @@ You could alternatively also use Postman to test the application.
     "finalCharge": "$8.14"
     }
     ```
+    
+- ### Tool CRUD
+  - ###### POST 'http://localhost:8080/tool/'
+  - ###### PUT 'http://localhost:8080/tool/{toolId}'
+  - ###### GET 'http://localhost:8080/tool/'
+  - ###### GET 'http://localhost:8080/tool/{toolId}'
+  - ###### DELETE 'http://localhost:8080/tool/{toolId}'
+  
+- ### ToolType CRUD
+  - ###### POST 'http://localhost:8080/tool-types/'
+  - ###### PUT 'http://localhost:8080/tool-types/{toolTypeName}'
+  - ###### GET 'http://localhost:8080/tool-types/'
+  - ###### GET 'http://localhost:8080/tool-types/{toolTypeName}'
+  - ###### DELETE 'http://localhost:8080/tool-types/{toolTypeName}'
 
 ## Database
 The application uses three main entities: 
