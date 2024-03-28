@@ -1,32 +1,30 @@
 package com.example.rentalapplication.service;
 
-import com.example.rentalapplication.DTO.CheckoutRequest;
-import com.example.rentalapplication.entity.RentalAgreement;
-import com.example.rentalapplication.entity.Tool;
-import com.example.rentalapplication.entity.ToolTypes;
-import com.example.rentalapplication.exception.ToolNotFoundException;
-import com.example.rentalapplication.repository.RentalAgreementRepository;
-import com.example.rentalapplication.repository.ToolRepository;
-import com.example.rentalapplication.repository.ToolTypesRepository;
+import com.example.rentalapplication.dto.CheckoutRequest;
+import com.example.rentalapplication.model.RentalAgreement;
+import com.example.rentalapplication.model.Tool;
+import com.example.rentalapplication.model.ToolTypes;
+import com.example.rentalapplication.util.DBUtils;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CheckoutService {
 
-    private final ToolRepository toolRepository;
-
-    private final ToolTypesRepository toolTypesRepository;
-
-    private final RentalAgreementRepository rentalAgreementRepository;
-
-
+    /**
+     * Processes a checkout request by validating it and creating a Rental Agreement.
+     * It ensures the rental day count is valid and the discount percent is within the acceptable range.
+     * The method retrieves tool information from the database-util and calculates the rental charges
+     * based on the tool type and the checkout request details.
+     *
+     * @param checkoutRequest The request containing the details for the tool rental checkout.
+     * @return RentalAgreement A detailed agreement containing the terms of the rental.
+     * @throws ValidationException if the rental day count is less than 1 or the discount percent is not within 0-100.
+     */
     public RentalAgreement processCheckOut(CheckoutRequest checkoutRequest)  {
         log.info("Processing checkout request: {}", checkoutRequest);
 
@@ -39,23 +37,15 @@ public class CheckoutService {
             throw new ValidationException("Discount percent must be between 0 and 100.");
         }
 
-        Tool tool = Optional.ofNullable(toolRepository.findToolByToolCode(checkoutRequest.getToolCode()))
-                .orElseThrow(() -> {
-                    log.error("Tool code not found: {}", checkoutRequest.getToolCode());
-                    return new ToolNotFoundException("Tool code not found.");
-                });
-        log.info("Tool was found: " + tool);
 
-        ToolTypes toolType = Optional.ofNullable(toolTypesRepository.findByType(tool.getToolType()))
-                .orElseThrow(() -> new ToolNotFoundException("Tool type not found."));
-        log.info("ToolType was found: " + toolType);
+        Tool tool = DBUtils.tools.get(checkoutRequest.getToolCode());
+
+        ToolTypes toolType = DBUtils.toolTypes.get(tool.getToolType());
 
         // all the calculations regarding the charged days, discount, and holidays happen at the very moment an instance of RentalAgreement is created
         RentalAgreement rentalAgreement = new RentalAgreement(checkoutRequest, tool, toolType);
         rentalAgreement.displayRentalAgreement();
 
-        rentalAgreementRepository.save(rentalAgreement);
-        log.info("RentalAgreement was saved into the db successfully.");
 
         return rentalAgreement;
 
