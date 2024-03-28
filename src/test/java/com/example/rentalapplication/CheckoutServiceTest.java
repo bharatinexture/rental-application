@@ -27,7 +27,7 @@ public class CheckoutServiceTest {
     private CheckoutService checkoutService;
 
     /**
-     * Test 1: to ensure the service throws a ValidationException when the discount percent is above 100.
+     * Test 1: to ensure the service throws a ValidationException when the discount percent is above 100 .
      */
     @Test
     void rentAgreementTest1(){
