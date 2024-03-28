@@ -1,59 +1,49 @@
 package com.example.rentalapplication;
 
-import com.example.rentalapplication.DTO.CheckoutRequest;
-import com.example.rentalapplication.entity.RentalAgreement;
-import com.example.rentalapplication.entity.Tool;
-import com.example.rentalapplication.entity.ToolTypes;
-import com.example.rentalapplication.repository.ToolRepository;
-import com.example.rentalapplication.repository.ToolTypesRepository;
+import com.example.rentalapplication.dto.CheckoutRequest;
+import com.example.rentalapplication.model.RentalAgreement;
 import com.example.rentalapplication.service.CheckoutService;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Test suite for the CheckoutService class.
+ * Validates the checkout process by ensuring rental agreements are correctly created and
+ * that proper exceptions are thrown for invalid input.
+ * All the inputs are as specified in the requirement spec.
+ */
 @SpringBootTest
 public class CheckoutServiceTest {
-
-    @Mock
-    private ToolRepository toolRepository;
-
-    @Mock
-    private ToolTypesRepository toolTypesRepository;
 
     @Autowired
     private CheckoutService checkoutService;
 
-    // Test 1
+    /**
+     * Test 1: to ensure the service throws a ValidationException when the discount percent is above 100.
+     */
     @Test
-    void invalidDiscountTest(){
-        CheckoutRequest request = new CheckoutRequest("JAKR",101, LocalDate.of(2015,9,3),5);
+    void rentAgreementTest1(){
+        CheckoutRequest request = new CheckoutRequest("JAKR",101, "09/03/15",5);
         assertThrows(ValidationException.class, () -> checkoutService.processCheckOut(request));
     }
 
-    @Test
-    void invalidRentalDaysTest(){
-        CheckoutRequest request = new CheckoutRequest("JAKR",101, LocalDate.of(2015,9,3),0);
-        assertThrows(ValidationException.class, () -> checkoutService.processCheckOut(request));
-    }
-
-    // Test 2
+    /**
+     * Test 2: to verify a rental agreement is correctly created with valid input parameters.
+     * This test validates the tool code, tool type, brand, rental days, checkout date,
+     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
+     * discount amount, and final charge are all correctly calculated and set.
+     */
     @Test
     void rentAgreementTest2(){
-        CheckoutRequest request = new CheckoutRequest("LADW",10, LocalDate.of(2020,7,2),3);
-        Tool tool = getTools().get(request.getToolCode());
-        Mockito.when(toolRepository.findToolByToolCode(request.getToolCode())).thenReturn(tool);
-        Mockito.when(toolTypesRepository.findByType(Mockito.any())).thenReturn(getToolTypes().get(tool.getToolType()));
+        CheckoutRequest request = new CheckoutRequest("LADW",10, "07/02/20",3);
         RentalAgreement rentalAgreement = checkoutService.processCheckOut(request);
         assertEquals(rentalAgreement.getToolCode(), "LADW");
         assertEquals(rentalAgreement.getToolType(), "Ladder");
@@ -69,13 +59,15 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("3.58"));
     }
 
-    // Test 3
+    /**
+     * Test 3: to verify a rental agreement is correctly created with valid input parameters.
+     * This test validates the tool code, tool type, brand, rental days, checkout date,
+     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
+     * discount amount, and final charge are all correctly calculated and set.
+     */
     @Test
     void rentAgreementTest3(){
-        CheckoutRequest request =new CheckoutRequest("CHNS",25, LocalDate.of(2015,7,2),5);
-        Tool tool = getTools().get(request.getToolCode());
-        Mockito.when(toolRepository.findToolByToolCode(request.getToolCode())).thenReturn(tool);
-        Mockito.when(toolTypesRepository.findByType(Mockito.any())).thenReturn(getToolTypes().get(tool.getToolType()));
+        CheckoutRequest request =new CheckoutRequest("CHNS",25, "07/02/15",5);
         RentalAgreement rentalAgreement = checkoutService.processCheckOut(request);
         assertEquals(rentalAgreement.getToolCode(), "CHNS");
         assertEquals(rentalAgreement.getToolType(), "Chainsaw");
@@ -91,13 +83,15 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("3.35"));
     }
 
-    // Test 4
+    /**
+     * Test 4: to verify a rental agreement is correctly created with valid input parameters.
+     * This test validates the tool code, tool type, brand, rental days, checkout date,
+     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
+     * discount amount, and final charge are all correctly calculated and set.
+     */
     @Test
     void rentAgreementTest4(){
-        CheckoutRequest request = new CheckoutRequest("JAKD",0, LocalDate.of(2015,9,3),6);
-        Tool tool = getTools().get(request.getToolCode());
-        Mockito.when(toolRepository.findToolByToolCode(request.getToolCode())).thenReturn(tool);
-        Mockito.when(toolTypesRepository.findByType(Mockito.any())).thenReturn(getToolTypes().get(tool.getToolType()));
+        CheckoutRequest request = new CheckoutRequest("JAKD",0, "09/03/15",6);
         RentalAgreement rentalAgreement = checkoutService.processCheckOut(request);
         assertEquals(rentalAgreement.getToolCode(), "JAKD");
         assertEquals(rentalAgreement.getToolType(), "Jackhammer");
@@ -113,13 +107,15 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("8.97"));
     }
 
-    // Test 5
+    /**
+     * Test 5: to verify a rental agreement is correctly created with valid input parameters.
+     * This test validates the tool code, tool type, brand, rental days, checkout date,
+     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
+     * discount amount, and final charge are all correctly calculated and set.
+     */
     @Test
     void rentAgreementTest5(){
-        CheckoutRequest request = new CheckoutRequest("JAKR",0, LocalDate.of(2015,7,2),9);
-        Tool tool = getTools().get(request.getToolCode());
-        Mockito.when(toolRepository.findToolByToolCode(request.getToolCode())).thenReturn(tool);
-        Mockito.when(toolTypesRepository.findByType(Mockito.any())).thenReturn(getToolTypes().get(tool.getToolType()));
+        CheckoutRequest request = new CheckoutRequest("JAKR",0, "07/02/15",9);
         RentalAgreement rentalAgreement = checkoutService.processCheckOut(request);
         assertEquals(rentalAgreement.getToolCode(), "JAKR");
         assertEquals(rentalAgreement.getToolType(), "Jackhammer");
@@ -135,13 +131,15 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("14.95"));
     }
 
-    // Test 6
+    /**
+     * Test 6: to verify a rental agreement is correctly created with valid input parameters.
+     * This test validates the tool code, tool type, brand, rental days, checkout date,
+     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
+     * discount amount, and final charge are all correctly calculated and set.
+     */
     @Test
     void rentAgreementTest6(){
-        CheckoutRequest request = new CheckoutRequest("JAKR",50, LocalDate.of(2020,7,2),4);
-        Tool tool = getTools().get(request.getToolCode());
-        Mockito.when(toolRepository.findToolByToolCode(request.getToolCode())).thenReturn(tool);
-        Mockito.when(toolTypesRepository.findByType(Mockito.any())).thenReturn(getToolTypes().get(tool.getToolType()));
+        CheckoutRequest request = new CheckoutRequest("JAKR",50, "07/02/20",4);
         RentalAgreement rentalAgreement = checkoutService.processCheckOut(request);
         assertEquals(rentalAgreement.getToolCode(), "JAKR");
         assertEquals(rentalAgreement.getToolType(), "Jackhammer");
@@ -157,23 +155,13 @@ public class CheckoutServiceTest {
         assertEquals(rentalAgreement.getFinalCharge(), new BigDecimal("1.49"));
     }
 
-    // utility Map to get Tools without interacting with the database
-    public Map<String, Tool>  getTools(){
-        Map<String,Tool> tools = new HashMap<>();
-        tools.put("CHNS", new Tool("CHNS", "Chainsaw", "Stihl"));
-        tools.put("LADW", new Tool("LADW", "Ladder", "Werner"));
-        tools.put("JAKD", new Tool("JAKD", "Jackhammer", "DeWalt"));
-        tools.put("JAKR", new Tool("JAKR", "Jackhammer", "Ridgid"));
-        return tools;
+    /**
+     * Test 7: to ensure the service throws a ValidationException when the discountPercent is out of the acceptable range,
+     * and the rental days are set to zero.
+     */
+    @Test
+    void invalidRentalDaysTest(){
+        CheckoutRequest request = new CheckoutRequest("JAKR",111, "09/03/15",0);
+        assertThrows(ValidationException.class, () -> checkoutService.processCheckOut(request));
     }
-
-    // utility Map to get the ToolTypes without interacting with the database
-    public Map<String, ToolTypes> getToolTypes(){
-        Map<String,ToolTypes> toolTypes = new HashMap<>();
-        toolTypes.put("Ladder", new ToolTypes("Ladder", new BigDecimal("1.99") , true, true, false));
-        toolTypes.put("Chainsaw", new ToolTypes("Chainsaw", new BigDecimal("1.49") , true, false, true));
-        toolTypes.put("Jackhammer", new ToolTypes("Jackhammer", new BigDecimal("2.99") , true, false, false));
-        return toolTypes;
-    }
-
 }

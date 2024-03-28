@@ -1,7 +1,8 @@
-package com.example.rentalapplication.entity;
+package com.example.rentalapplication.model;
 
-import com.example.rentalapplication.DTO.CheckoutRequest;
-import jakarta.persistence.*;
+import com.example.rentalapplication.dto.CheckoutRequest;
+import com.example.rentalapplication.util.DateUtil;
+import com.example.rentalapplication.util.NumberFormatUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,61 +15,63 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Locale;
 
+/**
+ * Represents a rental agreement detailing the terms of the tool rental.
+ * Includes identification information, rental terms, charges, due date, and the discount applied.
+ */
 @Data
-@Entity
-@Table(name = "rental_agreement")
 @AllArgsConstructor
 @NoArgsConstructor
 public class RentalAgreement {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "rental_agreement_number")
     private Long rentalAgreementNumber;
-    @Column(nullable = false, name = "tool_code")
     private String toolCode;
-    @Column(nullable = false, name = "tool_type")
     private String toolType;
-    @Column(nullable = false, name = "brand")
     private String brand;
-    @Column(nullable = false, name = "rental_days")
     private int rentalDays;
-    @Column(nullable = false, name = "checkout_date")
     private LocalDate checkOutDate;
-    @Column(nullable = false, name = "due_date")
     private LocalDate dueDate;
-    @Column(nullable = false, name = "daily_rental_charge")
     private BigDecimal dailyRentalCharge;
-    @Column(nullable = false, name = "charge_days")
     private int chargedDays;
-    @Column(nullable = false, name = "pre_discount_charge")
     private BigDecimal preDiscountCharge;
-    @Column(nullable = false, name = "discount_percent")
     private int discountPercent;
-    @Column(nullable = false, name = "discount_amount")
     private BigDecimal discountAmount;
-    @Column(nullable = false, name = "final_charge")
     private BigDecimal finalCharge;
 
+
+    /**
+     * Constructor that creates a Rental Agreement based on the checkout request, tool, and tool type.
+     * It calculates the due date, chargeable days, pre-discount charge, discount amount, and final charge.
+     *
+     * @param checkout The checkout request containing rental start date, number of rental days, and discount percentage.
+     * @param tool     The tool being rented.
+     * @param toolType The type of the tool, which determines rental charge and chargeable days policy.
+     */
     public RentalAgreement(CheckoutRequest checkout, Tool tool, ToolTypes toolType) {
         this.toolCode = tool.getToolCode();
         this.toolType = tool.getToolType();
         this.brand = tool.getBrand();
         this.rentalDays = checkout.getRentalDayCount();
-        this.checkOutDate = checkout.getCheckOutDate();
-        this.dueDate = calculateDueDate(checkout.getCheckOutDate(), checkout.getRentalDayCount());
+        this.checkOutDate = DateUtil.convertStringToLocalDate(checkout.getCheckOutDate());
+        this.dueDate = calculateDueDate(checkOutDate, checkout.getRentalDayCount());
         this.dailyRentalCharge = toolType.getDailyRentalCharge();
-        this.chargedDays = countChargeDays(checkout.getCheckOutDate(), dueDate, toolType);
+        this.chargedDays = countChargeDays(checkOutDate, dueDate, toolType);
         this.preDiscountCharge = dailyRentalCharge.multiply(BigDecimal.valueOf(chargedDays)).setScale(2, RoundingMode.HALF_UP);
         this.discountPercent = checkout.getDiscountPercent();
         this.discountAmount = preDiscountCharge.multiply(BigDecimal.valueOf(discountPercent / 100.0)).setScale(2, RoundingMode.HALF_UP);
         this.finalCharge = preDiscountCharge.subtract(discountAmount);
     }
 
+    /**
+     * Calculates the due date using the available util methods
+     */
     private LocalDate calculateDueDate(LocalDate checkoutDate, int rentalDays) {
         return  checkoutDate.plusDays(rentalDays);
     }
 
+    /**
+     * Counts the total chargedDays given the checkoutDate, dueDate and the tool's type
+     */
     private int countChargeDays(LocalDate checkoutDate, LocalDate dueDate, ToolTypes toolType) {
         int chargeDays = 0;
         LocalDate currentDate = checkoutDate.plusDays(1);
@@ -81,7 +84,9 @@ public class RentalAgreement {
         return chargeDays;
     }
 
-
+    /**
+     * Checks whether a certain day is a charge day, charging the customer for the rented tool on said day
+     */
     private boolean isChargeDay(LocalDate date, ToolTypes toolType) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
@@ -93,6 +98,11 @@ public class RentalAgreement {
         }
     }
 
+    /**
+     * Checks whether a certain date is a Holiday.
+     * For now, only two holidays: The Independence Day (4th of July),
+     * and Labor Day (First Monday of September).
+     */
     private boolean isHoliday(LocalDate date) {
         Month month = date.getMonth();
         int day = date.getDayOfMonth();
@@ -105,25 +115,30 @@ public class RentalAgreement {
 
 
         } else
+            // Handle Labor day
             return month == Month.SEPTEMBER && day<=7 && date.getDayOfWeek() == DayOfWeek.MONDAY;
     }
 
+    /**
+     * Displays the details of the rental agreement on the console.
+     * The output includes formatted tool-information, rental terms, and calculated charges.
+     */
     public void displayRentalAgreement() {
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.US);
 
-        System.out.println("----------------------------------------------------------------------------");
+        System.out.println("-----------------------------------Rental Agreement-----------------------------------------");
         System.out.println("Tool code: " + toolCode);
         System.out.println("Tool type: " + toolType);
         System.out.println("Tool brand: " + brand);
         System.out.println("Rental days: " + rentalDays);
-        System.out.printf("Checkout date: %tm/%td/%ty%n", checkOutDate, checkOutDate, checkOutDate);
-        System.out.printf("Due date: %tm/%td/%ty%n", dueDate, dueDate, dueDate);
-        System.out.printf("Daily rental charge: %s%n", currencyFormatter.format(dailyRentalCharge));
+        System.out.println("Checkout date: "+ DateUtil.formatDate(checkOutDate));
+        System.out.println("Due date: "+ DateUtil.formatDate(dueDate));
+        System.out.println("Daily rental charge: "+ NumberFormatUtil.formatAmount(dailyRentalCharge));
         System.out.println("Charge days: " + chargedDays);
-        System.out.println("Pre-discount charge: " + currencyFormatter.format(preDiscountCharge));
+        System.out.println("Pre-discount charge: " + NumberFormatUtil.formatAmount(preDiscountCharge));
         System.out.println("Discount percent: " + discountPercent + "%");
-        System.out.println("Discount amount: " + currencyFormatter.format(discountAmount));
-        System.out.println("Final charge: " + currencyFormatter.format(finalCharge));
+        System.out.println("Discount amount: " + NumberFormatUtil.formatAmount(discountAmount));
+        System.out.println("Final charge: " + NumberFormatUtil.formatAmount(finalCharge));
         System.out.println("----------------------------------------------------------------------------");
     }
 
