@@ -36,10 +36,7 @@ public class CheckoutServiceTest {
     }
 
     /**
-     * Test 2: to verify a rental agreement is correctly created with valid input parameters.
-     * This test validates the tool code, tool type, brand, rental days, checkout date,
-     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
-     * discount amount, and final charge are all correctly calculated and set.
+     * Test 2: checkout with toolCode: LADW, discountPercent: 10, checkoutDate: 07/02/20 and rentalDays: 3.
      */
     @Test
     void rentAgreementTest2(){
@@ -60,10 +57,7 @@ public class CheckoutServiceTest {
     }
 
     /**
-     * Test 3: to verify a rental agreement is correctly created with valid input parameters.
-     * This test validates the tool code, tool type, brand, rental days, checkout date,
-     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
-     * discount amount, and final charge are all correctly calculated and set.
+     * Test 3: checkout with toolCode: CHNS, discountPercent: 25, checkoutDate: 07/02/15 and rentalDays: 5.
      */
     @Test
     void rentAgreementTest3(){
@@ -84,10 +78,7 @@ public class CheckoutServiceTest {
     }
 
     /**
-     * Test 4: to verify a rental agreement is correctly created with valid input parameters.
-     * This test validates the tool code, tool type, brand, rental days, checkout date,
-     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
-     * discount amount, and final charge are all correctly calculated and set.
+     * Test 4: checkout with toolCode: JAKD, discountPercent: 0, checkoutDate: 09/03/15 and rentalDays: 6.
      */
     @Test
     void rentAgreementTest4(){
@@ -108,10 +99,7 @@ public class CheckoutServiceTest {
     }
 
     /**
-     * Test 5: to verify a rental agreement is correctly created with valid input parameters.
-     * This test validates the tool code, tool type, brand, rental days, checkout date,
-     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
-     * discount amount, and final charge are all correctly calculated and set.
+     * Test 5: checkout with toolCode: JAKR, discountPercent: 0, checkoutDate: 07/02/15 and rentalDays: 9.
      */
     @Test
     void rentAgreementTest5(){
@@ -132,10 +120,7 @@ public class CheckoutServiceTest {
     }
 
     /**
-     * Test 6: to verify a rental agreement is correctly created with valid input parameters.
-     * This test validates the tool code, tool type, brand, rental days, checkout date,
-     * due date, daily rental charge, charged days, pre-discount charge, discount percent,
-     * discount amount, and final charge are all correctly calculated and set.
+     * Test 6: checkout with toolCode: JAKR, discountPercent: 50, checkoutDate: 07/02/20 and rentalDays: 4.
      */
     @Test
     void rentAgreementTest6(){

@@ -124,8 +124,6 @@ public class RentalAgreement {
      * The output includes formatted tool-information, rental terms, and calculated charges.
      */
     public void displayRentalAgreement() {
-        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.US);
-
         System.out.println("-----------------------------------Rental Agreement-----------------------------------------");
         System.out.println("Tool code: " + toolCode);
         System.out.println("Tool type: " + toolType);
